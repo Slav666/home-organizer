@@ -1,12 +1,10 @@
 import axios from "axios";
-import { mockItems } from "./mock/items";
 
-export type Item = {
-  id: string;
-  name: string;
-  location: string;
-  tags: string[]; // pierwszy tag to typ
-};
+const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+
+if (!baseUrl) {
+  throw new Error("Missing NEXT_PUBLIC_API_URL in environment variables");
+}
 
 export type ItemPayload = {
   name: string;
@@ -14,29 +12,35 @@ export type ItemPayload = {
   type: string;
 };
 
-// ✅ PRZEŁĄCZNIK MOCKÓW
-const USE_MOCK = true;
-
-export const getItems = async (): Promise<Item[]> => {
-  if (USE_MOCK) {
-    // Udajemy ładujące się dane
-    return new Promise((resolve) => setTimeout(() => resolve(mockItems), 300));
-  } else {
-    const res = await axios.get("http://localhost:8000/items");
-    return res.data;
-  }
+export type Item = {
+  id: string;
+  name: string;
+  location: string;
+  tags: string[];
 };
 
 export const addItem = async ({ name, location, type }: ItemPayload) => {
-  if (USE_MOCK) {
-    console.warn("Mock addItem: symulacja zapisu:", { name, location, type });
-    return { id: Math.random().toString(), message: "Mock item added" };
-  } else {
-    const res = await axios.post("http://localhost:8000/items", {
+  const response = await axios.post(
+    baseUrl,
+    {
       name,
       location,
-      tags: [type],
-    });
-    return res.data;
-  }
+      type,
+    }
+  );
+  return response.data;
+};
+
+export const getItems = async (): Promise<Item[]> => {
+  const res = await axios.get(
+    baseUrl
+  );
+  return res.data;
+};
+
+export const deleteItems = async (id: string) => {
+  const res = await axios.delete(
+    `${baseUrl}/${id}`
+  );
+  return res.data;
 };
