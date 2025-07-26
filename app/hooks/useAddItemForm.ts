@@ -16,10 +16,10 @@ export const useAddItemForm = () => {
     setLoading(true);
     try {
       const result = await addItem(data);
-      setSuccess(`✅ Dodano przedmiot (ID: ${result.id})`);
+      setSuccess(`✅ Item added (ID: ${result.id})`);
       reset();
     } catch (error) {
-      alert("❌ Błąd przy dodawaniu rzeczy");
+      alert("❌ Error adding items");
     } finally {
       setLoading(false);
     }
