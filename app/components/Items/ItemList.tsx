@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { getItems, deleteItems, Item } from "../../lib/api";
+import { getItems, deleteItems, Item, updateItem } from "../../lib/api";
 import SearchAndFilter from "../SearchAndFilter/SearchAndFilter";
 import ItemCard from "./ItemCard";
 
@@ -28,14 +28,64 @@ const ItemList = () => {
   };
 
   const handleEdit = (id: string | null) => {
-    setEditingId(id);
-    if (id) {
-      const itemToEdit = items.find((item) => item.id === id);
-      setEditedItem(itemToEdit || {});
+    const itemToEdit = items.find((item) => item.id === id);
+    if (itemToEdit) {
+      setEditingId(id);
+      setEditedItem({
+        id: itemToEdit.id,
+        name: itemToEdit.name,
+        location: itemToEdit.location,
+        tags: [...itemToEdit.tags],
+      });
     } else {
+      setEditingId(null);
       setEditedItem({});
     }
   };
+
+ const handleSave = async () => {
+   if (
+     !editedItem.id ||
+     !editedItem.name ||
+     !editedItem.location ||
+     !editedItem.tags?.[0]
+   ) {
+     alert("⚠️ Please fill out all fields");
+     return;
+   }
+
+   try {
+     await updateItem({
+       id: editedItem.id,
+       name: editedItem.name,
+       location: editedItem.location,
+       type: editedItem.tags[0],
+     });
+
+     setItems((prev) =>
+       prev.map((item) =>
+         item.id === editedItem.id
+           ? {
+               ...item,
+               name: editedItem.name!,
+               location: editedItem.location!,
+               tags: [editedItem.tags![0]],
+             }
+           : item
+       )
+     );
+
+     setEditingId(null);
+     setEditedItem({});
+   } catch (error) {
+     alert("❌ Failed to update item.");
+   }
+ };
+
+ const handleCancel = () => {
+   setEditingId(null);
+   setEditedItem({});
+ };
 
   const filtered = items.filter((item) => {
     const nameMatch = item.name.toLowerCase().includes(search.toLowerCase());
@@ -66,6 +116,8 @@ const ItemList = () => {
             isEditing={editingId === item.id}
             editedItem={editedItem}
             setEditedItem={setEditedItem}
+            onSave={handleSave}
+            onCancel={handleCancel}
           />
         ))}
       </div>

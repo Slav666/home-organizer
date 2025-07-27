@@ -44,3 +44,8 @@ export const deleteItems = async (id: string) => {
   );
   return res.data;
 };
+
+export const updateItem = async (item: ItemPayload & { id: string }) => {
+  const res = await axios.put(baseUrl, item);
+  return res.data;
+};

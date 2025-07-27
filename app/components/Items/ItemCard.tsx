@@ -9,6 +9,8 @@ interface ItemCardProps {
   isEditing: boolean;
   editedItem: Partial<Item>;
   setEditedItem: React.Dispatch<React.SetStateAction<Partial<Item>>>;
+  onSave: () => void;
+  onCancel: () => void;
 }
 
 const ItemCard: React.FC<ItemCardProps> = ({
@@ -18,6 +20,8 @@ const ItemCard: React.FC<ItemCardProps> = ({
   isEditing,
   editedItem,
   setEditedItem,
+  onSave,
+  onCancel,
 }) => {
   return (
     <div className="border rounded-lg p-4 shadow-sm bg-white">
@@ -46,10 +50,12 @@ const ItemCard: React.FC<ItemCardProps> = ({
           />
           <div className="flex justify-end gap-2">
             <Button
+              onClick={onSave}
               className="px-3 py-1 text-white bg-green-600 rounded"
               label="Save"
             />
             <Button
+              onClick={onCancel}
               className="px-3 py-1 text-gray-700 border rounded"
               label="Cancel"
             />
